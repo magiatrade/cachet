@@ -19,16 +19,20 @@ use Symfony\Component\HttpFoundation\Response;
 class TrustProxies extends LaravelTrustProxies
 {
     /**
-     * Handle an incoming request.
+     * The trusted proxies for this application.
+     * Use '*' to trust all proxies or specify individual IPs.
      *
-     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
+     * @var array|string|null
      */
-    public function handle(Request $request, Closure $next): Response
-    {
-        if (config('cachet.trusted_proxies')) {
-            LaravelTrustProxies::at(explode(',', config('cachet.trusted_proxies')));
-        }
-
-        return parent::handle($request, $next);
-    }
+    protected $proxies = '*'; // Trust all proxies (use with caution)
+    /**
+     * The headers that should be used to detect proxies.
+     *
+     * @var int
+     */
+    protected $headers = Request::HEADER_X_FORWARDED_FOR
+                     | Request::HEADER_X_FORWARDED_HOST
+                     | Request::HEADER_X_FORWARDED_PORT
+                     | Request::HEADER_X_FORWARDED_PROTO
+                     | Request::HEADER_X_FORWARDED_AWS_ELB;
 }
